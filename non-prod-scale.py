@@ -14,6 +14,7 @@ namespaces = ["monitoring", "logging", "non-prod"]
 file_path = "workloads_data.json"
 karpenter_provisioner = "default"
 kubernetes_context_name = "non-prod-cluster"
+bucket_name = "test-bucket-1999"
 
 client = boto3.client('eks',region_name="ap-south-1")
 logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
@@ -33,7 +34,7 @@ def cluster_context_switch():
 
 
 def workload_scaleup():
-    s3_fetch = f"aws s3 cp s3://eks-dev/workloads_data.json ."
+    s3_fetch = f"aws s3 cp s3://{bucket_name}/workloads_data.json ."
     subprocess.run(s3_fetch, shell=True, check=True)
     with open(file_path, "r") as file:
         data = json.load(file)
@@ -110,7 +111,7 @@ def workload_scaledown():
         print(f"The file '{file_path}' does not exist.")
         with open(file_path, "w") as file:
             json.dump(data, file)
-        s3_backup = f"aws s3 mv {file_path} s3://eks-dev/workloads_data.json"
+        s3_backup = f"aws s3 mv {file_path} s3://{bucket_name}/workloads_data.json"
         subprocess.run(s3_backup, shell=True, check=True)
 
 
